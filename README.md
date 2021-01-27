@@ -12,7 +12,6 @@ Projet de cours d'ingénierie système et modélisation robotique à l'ENSTA Bre
 
 ### Démarrer la simulation
 
-###### A compléter avec la/les commande(s) à lancer.
 ```bash
 colcon build --symlink-install
 
