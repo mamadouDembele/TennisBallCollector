@@ -14,7 +14,11 @@ Projet de cours d'ingénierie système et modélisation robotique à l'ENSTA Bre
 
 ###### A compléter avec la/les commande(s) à lancer.
 ```bash
-# TODO
+colcon build --symlink-install
+
+. install/setup.bash
+
+ros2 launch tennis_court tennis_court.launch.py
 ```
 
 
