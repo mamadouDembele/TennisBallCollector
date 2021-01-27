@@ -1,11 +1,11 @@
 # Debrief du xx/xx/xxxx
 
-PO: ...
+PO: Jules Berhault
 
 
 ## Bilan
 
-Pourcentage de tâches réalisées: ... %
+Pourcentage des taches réalisées
 
 ### Ce qui a fonctionné
 

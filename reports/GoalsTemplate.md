@@ -1,6 +1,6 @@
-# Objectifs du xx/xx/xxxx
+# Objectifs du 27/01/2021
 
-PO: ...
+PO: Jules Berhault (julesberhault)
 
 
 ## Fonctionnalités attendues
