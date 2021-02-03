@@ -18,6 +18,15 @@ colcon build --symlink-install
 . install/setup.bash
 
 ros2 launch tennis_court tennis_court.launch.py
+
+# Balls Localization 
+
+ros2 run tennis_court read_camera.py
+
+# Spawn the Robot
+
+ros2 launch robot_tennis_gazebo spawner.launch.py
+
 ```
 
 
