@@ -20,7 +20,9 @@
       <origin xyz="0.0 0.0 0.05" />
    </collision>
   </link>
-
+  <gazebo reference="chassis">
+    <material>Gazebo/Red</material>
+  </gazebo>
   <link name="left_wheel">
     <inertial>
      <origin xyz="0 0 0" rpy="0 0 0"/>

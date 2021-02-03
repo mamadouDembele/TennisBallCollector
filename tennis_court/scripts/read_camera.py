@@ -93,12 +93,17 @@ class Tracker:
         return centers, frame
 
 def getBallPosition(centers):
-    courtWidthPix = 1035
-    courtWidthM = 23.77 
+    tr_matrix = np.array([[400, -688]]).T
+    rot_matrix = np.array([[0, -1], [1, 0]])
+    courtWidthPix = 800
+    courtWidthM = 16
     unit = courtWidthM / courtWidthPix
     for center in centers:
-        center[0] = center[0] * unit
-        center[1] = center[1] * unit
+        center_matrix = np.array([[center[0], center[1]]]).T
+        center_matrix = rot_matrix @ center_matrix + tr_matrix
+        center_matrix[1, 0] = -center_matrix[1, 0]
+        center[0] = center_matrix[0, 0] * unit
+        center[1] = center_matrix[1, 0] * unit
     return centers
 
 def getProjectedFrame(frame):
@@ -123,8 +128,8 @@ def computerVision(frame):
 
     green_lower = (30, 50, 50)
     green_upper = (70, 255, 255)
-    red_lower = (160, 50, 50)
-    red_upper = (180, 255, 255)
+    red_lower = (0, 50, 50)
+    red_upper = (10, 255, 255)
     
     height, width = frame.shape[0], frame.shape[1]
 
@@ -135,9 +140,9 @@ def computerVision(frame):
     robot_centers, frame = redtracker.track(frame)
     
     ball_centers = getBallPosition(ball_centers)
-    robot_centers = getBallPosition(robot_centers)
+    robot_center = getBallPosition(robot_centers)
 
-    return ball_centers, frame 
+    return ball_centers, robot_center, frame 
 
 
 
@@ -146,9 +151,11 @@ def computerVision(frame):
 def detect_and_draw(imgmsg):
     br = CvBridge()
     img = br.imgmsg_to_cv2(imgmsg, "bgr8")
-    ball_centers, frame = computerVision(img)
-    cv2.imshow("Frame", frame)
-    cv2.waitKey(6)
+    ball_centers, robot_center, frame = computerVision(img)
+    print("Ball center : ", ball_centers)
+    print("Robot center : ", robot_center)
+    #cv2.imshow("Frame", frame)
+    #cv2.waitKey(6)
     
     # cv2.imwrite('/tmp/post_im.png', img)
 
