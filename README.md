@@ -25,8 +25,10 @@ ros2 launch tennis_court tennis_court.launch.py
 
 ### Membres
 
-###### A compléter avec les membres du groupe.
-
+* **Jules Berhault** - 
+* **Quentin Brateau** -  [Teusner](https://github.com/Teusner) :sunglasses:
+* **Paul-Antoine Le Tolguennec** - 
+* **Gwendal Priser** - [gwendalp](https://github.com/gwendalp) :ocean:
 
 ### Gestion de projet
 
