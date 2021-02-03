@@ -12,9 +12,12 @@ Projet de cours d'ingénierie système et modélisation robotique à l'ENSTA Bre
 
 ### Démarrer la simulation
 
-###### A compléter avec la/les commande(s) à lancer.
 ```bash
-# TODO
+colcon build --symlink-install
+
+. install/setup.bash
+
+ros2 launch tennis_court tennis_court.launch.py
 ```
 
 
@@ -22,13 +25,15 @@ Projet de cours d'ingénierie système et modélisation robotique à l'ENSTA Bre
 
 ### Membres
 
-###### A compléter avec les membres du groupe.
-
+* **Jules Berhault** - 
+* **Quentin Brateau** -  [Teusner](https://github.com/Teusner) :sunglasses:
+* **Paul-Antoine Le Tolguennec** - 
+* **Gwendal Priser** - [gwendalp](https://github.com/gwendalp) :ocean:
 
 ### Gestion de projet
 
-###### A compléter avec le lien vers votre [Taiga](https://taiga.io).
-
+Voici le lien [Taiga](https://tree.taiga.io/project/gwendalp-tennis-ball-collector/timeline).
+https://tree.taiga.io/project/gwendalp-tennis-ball-collector/timeline
 
 
 ## Structure du dépôt

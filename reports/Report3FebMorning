@@ -1,0 +1,25 @@
+# Objectifs du 27/01/2021
+
+PO: Gwendal Priser
+
+Abandon de la solution technique pensée au sprint 1 : aspirateur balles + remorque -> Complexe
+
+## Fonctionnalités attendues
+
+Nous pensons seulement pousser les balles jusqu'à la zone de récup. 
+
+
+
+
+## Tâches à réaliser
+
+* Robot Mobile avec pince à l'avant (type chasse-neige inversée) 
+* Node d'atteinte de cible.
+* Machine à état passage de filet. 
+
+Tout est là https://tree.taiga.io/project/gwendalp-tennis-ball-collector/kanban
+
+## Challenges techniques
+
+La pince doit contenir les balles. 
+
