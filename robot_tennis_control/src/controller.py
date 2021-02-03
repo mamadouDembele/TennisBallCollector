@@ -1,8 +1,7 @@
 import rclpy
 from rclpy.node import Node
 
-from geometry_msgs.msg import Pose, Twist, TransformStamped
-from tf2_msgs.msg import TFMessage
+from geometry_msgs.msg import Pose, Twist
 
 import numpy as np
 
@@ -10,24 +9,26 @@ class Controller(Node):
 
     def __init__(self):
         super().__init__('controller')
-        self.publisher_ = self.create_publisher(String, 'cmd_vel', 25)
+
         timer_period = 0.05
         self.timer = self.create_timer(timer_period, self.timer_callback)
 
-        self.robot_subscription = self.create_subscription(TFMessage, 'link1', self.robot_position_callback, 25)
-        self.robot_subscription # prevent undeclared variable
+        # Publisher
+        self.publisher = self.create_publisher(Twist, 'cmd_vel', 25)
 
-        self.ball_subscription = self.create_subscription(Pose, 'ball', self.ball_position_callback, 25)
-        self.ball_subscription # Prevent undeclared variable
+        # Subscriber
+        self.robot_subscription = self.create_subscription(Pose, 'pose_rob', self.robot_position_callback, 25)
+        self.ball_subscription = self.create_subscription(Pose, 'pose_ball', self.ball_position_callback, 25)
 
+        # Ball and robot position
         self.X = np.zeros((3, 1))
         self.B = np.zeros((3, 1))
 
     def robot_position_callback(self, data):
-        self.X = np.array([[data.x], [data.y], [data.z]])
+        self.X = np.array([[data.Point.x], [data.Point.y], [data.Point.z]])
     
     def ball_position_callback(self, data):
-        self.B = np.array([[data.x], [data.y], [data.z]])
+        self.B = np.array([[data.Point.x], [data.Point.y], [data.Point.z]])
 
     def timer_callback(self):
         d = (self.B - self.X) / np.linalg.norm(self.B - self.X)
@@ -36,8 +37,9 @@ class Controller(Node):
         msg = Twist()
         msg.linear.x = d[0, 0]
         msg.linear.y = d[1, 0]
-        msg.angular.z = 0.
-        self.publisher_.publish(msg)
+
+        # Publishing
+        self.publisher.publish(msg)
         self.get_logger().info("Publishing: {}, {}, {}".format(msg.linear.x, msg.linear.y, msg.angular.z))
 
 
