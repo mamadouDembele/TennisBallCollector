@@ -25,13 +25,15 @@ class Controller(Node):
         self.B = np.zeros((3, 1))
 
     def robot_position_callback(self, data):
-        self.X = np.array([[data.Point.x], [data.Point.y], [data.Point.z]])
+        self.X = np.array([[data.position.x], [data.position.y], [data.position.z]])
     
     def ball_position_callback(self, data):
-        self.B = np.array([[data.Point.x], [data.Point.y], [data.Point.z]])
+        self.B = np.array([[data.position.x], [data.position.y], [data.position.z]])
 
     def timer_callback(self):
-        d = (self.B - self.X) / np.linalg.norm(self.B - self.X)
+        d = (self.B - self.X)
+        if not np.allclose(d, np.zeros((3, 1))):
+            d /= np.linalg.norm(self.B - self.X)
 
         # Building message
         msg = Twist()
