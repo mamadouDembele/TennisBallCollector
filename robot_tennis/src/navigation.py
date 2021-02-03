@@ -1,12 +1,9 @@
-import math
-import numpy
-import sys
+import numpy as np
 
-from geometry_msgs.msg import PoseStamped
-from geometry_msgs.msg import Bool
+from geometry_msgs.msg import Pose
+from std_msgs.msg import Bool
 from rclpy.node import Node
 from rclpy.qos import QoSProfile
-from nav_msgs.msg import Odometry
 
 
 class TennisCollectorNavigation(Node):
@@ -27,16 +24,27 @@ class TennisCollectorNavigation(Node):
         self.y_wp = 0.0
         self.move = False
 
-        self.waypoint_pub = self.create_publisher(, 'waypoint', qos)
+        qos = QoSProfile(depth=10)
 
+
+        # PUBLISHER INITIALIZATION
+        #-------------------------------------------------------------------
+        self.wp_pub = self.create_publisher(Pose, 'waypoint', qos)
+
+        self.move_pub = self.create_publisher(Bool, 'move', qos)
+        #-------------------------------------------------------------------
+
+
+        # PUBLISHER INITIALIZATION
+        #-------------------------------------------------------------------
         self.ball_sub = self.create_subscription(
-            PoseStamped,
+            Pose,
             'ball',
             self.ball_callback,
             qos)
         
         self.rob_sub = self.create_subscription(
-            PoseStamped,
+            Pose,
             'robot',
             self.rob_callback,
             qos)
@@ -44,19 +52,19 @@ class TennisCollectorNavigation(Node):
         self.is_ball_collected_sub = self.create_subscription(
             Bool,
             'ibc',
-            self.rob_callback,
+            self.ibc_callback,
             qos)
 
         self.is_ball_on_court_sub = self.create_subscription(
             Bool,
             'iboc',
-            self.rob_callback,
+            self.iboc_callback,
             qos)
+        #-------------------------------------------------------------------
+
 
     def ball_callback(self, msg):
-
-        self.is_ball_collected = msg.pose.pose.position.x
-        self.is_ball_on_court = msg.pose.pose.position.x
+        
         self.pose_ball_x = msg.pose.pose.position.x
         self.pose_ball_y = msg.pose.pose.position.y
 
@@ -65,15 +73,26 @@ class TennisCollectorNavigation(Node):
         self.pose_rob_x = msg.pose.pose.position.x
         self.pose_rob_y = msg.pose.pose.position.y
 
-    def waypoint(self):
+    def ibc_callback(self, msg):
+
+        self.is_ball_collected = msg.bool.data
+
+    def iboc_callback(self, msg):
+
+        self.is_ball_on_court = msg.bool.data
+
+
+    def navigation(self):
+        pose = Pose()
+        bool = Bool()
 
         # STATE 1: GO TO THE OTHER SIDE OF THE COURT BYPASSING THE NET
         #-------------------------------------------------------------------
         if self.state == 1:
 
             if self.is_ball_on_court == True:
-                if sign(self.pose_rob.y) != sign(self.pose_ball_y):
-                    self.x_wp = 6.5*sign(self.poserob.x)
+                if np.sign(self.pose_rob.y) != np.sign(self.pose_ball_y):
+                    self.x_wp = 6.5*np.sign(self.poserob.x)
                     self.y_wp = 0.0
                 else:
                     self.state = 2
@@ -87,7 +106,7 @@ class TennisCollectorNavigation(Node):
         if self.state == 2:
 
             if self.is_ball_on_court == True:
-                if sign(self.pose_rob.y) != sign(self.pose_ball_y):
+                if np.sign(self.pose_rob.y) != np.sign(self.pose_ball_y):
                     state = 2
                 else:
                     self.x_wp = self.pose_ball_x
@@ -102,8 +121,8 @@ class TennisCollectorNavigation(Node):
         if self.state == 3:
 
             if self.is_ball_collected == True:
-                self.x_wp = 7.0*sign(self.pose_rob.y)
-                self.y_wp = 14.0*sign(self.pose_rob.y)
+                self.x_wp = 7.0*np.sign(self.pose_rob.y)
+                self.y_wp = 14.0*np.sign(self.pose_rob.y)
             else:
                 self.state = 2
         #-------------------------------------------------------------------
@@ -113,7 +132,7 @@ class TennisCollectorNavigation(Node):
         #-------------------------------------------------------------------
         else: # state == 0
 
-            if self.is_ball_on_court == True
+            if self.is_ball_on_court == True:
                 self.state = 2
                 self.move == True
             else:
@@ -125,4 +144,13 @@ class TennisCollectorNavigation(Node):
                     self.move = True
         #-------------------------------------------------------------------
 
-        self.wp_pub.publish( "publish self.wp" )
+
+        # PUBLISHING WAYPONT (POSE) AND MOVING COMMAND (BOOL)
+        #-------------------------------------------------------------------
+        pose.pose.position.x = self.x_wp
+        pose.pose.position.y = self.y_wp
+        self.wp_pub.publish(pose)
+
+        bool.data = self.move
+        self.move_pub.publish(bool)
+        #-------------------------------------------------------------------
