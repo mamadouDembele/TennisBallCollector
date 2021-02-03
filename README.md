@@ -32,8 +32,8 @@ ros2 launch tennis_court tennis_court.launch.py
 
 ### Gestion de projet
 
-###### A compléter avec le lien vers votre [Taiga](https://taiga.io).
-
+Voici le lien [Taiga](https://tree.taiga.io/project/gwendalp-tennis-ball-collector/timeline).
+https://tree.taiga.io/project/gwendalp-tennis-ball-collector/timeline
 
 
 ## Structure du dépôt
