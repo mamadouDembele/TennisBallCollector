@@ -31,6 +31,8 @@ def euler_from_quaternion(x, y, z, w):
      
         return roll_x, pitch_y, yaw_z # in radians
 
+def sawtooth(x):
+    return (x + np.pi) % (2*np.pi) - np.pi
     
 
 class Controller(Node):
@@ -51,14 +53,16 @@ class Controller(Node):
 
         self.robot_odometry_subscription = self.create_subscription(Odometry, 'odom', self.odometry_callback, 25)
 
-        # Ball and robot position
-        self.X = np.zeros((3, 1))
-        self.B = np.zeros((3, 1))
-
         # Changing control law
         self.isNear = False
         self.distance_near = 3
-        self.distance_threshold = 0.5
+        self.distance_threshold = 0.8
+
+        # Ball and robot position
+        self.X = np.zeros((3, 1))
+        self.B = np.zeros((3, 1))
+        self.A = np.zeros((3, 1))
+        self.A[0, 0] = - self.distance_near
 
     def robot_position_callback(self, data):
         self.X[0, 0] = data.position.x
@@ -77,40 +81,49 @@ class Controller(Node):
     def ball_position_callback(self, data):
         (roll, pitch, yaw) = euler_from_quaternion (data.orientation.x, data.orientation.y, data.orientation.z, data.orientation.w)
         self.B = np.array([[data.position.x], [data.position.y], [yaw]])
+        R = np.array([[np.cos(yaw), np.sin(yaw), 0], [-np.sin(yaw), np.cos(yaw), 0], [0, 0, 1]])
+        self.A = self.B + R @ np.array([[- self.distance_near], [0], [0]])
 
     def timer_callback(self):
-        # Position error processing
-        e = (self.B - self.X)
 
-        # Switching control law
-        if np.linalg.norm(e) < self.distance_near - self.distance_threshold:
-            self.isNear = True
-        if np.linalg.norm(e) > self.distance_near + self.distance_threshold:
-            self.isNear = False
-
-        # Computing angle control
+        # Position error processing in different cases
         if self.isNear:
-            theta = self.B[2, 0] - self.X[2, 0]
+            e = (self.B - self.X)
+            if np.linalg.norm(e[:2]) > self.distance_near + 2*self.distance_threshold:
+                self.isNear = False
         else:
-            theta = np.arctan2(e[1, 0], e[0, 0]) - self.X[2, 0]
-        
-        # Computing position control
-        if not np.allclose(e, np.zeros((3, 1))):
-            e /= np.linalg.norm(e)
-        else:
-            e = np.zeros((3, 1))
+            e = (self.A - self.X)
+            if np.linalg.norm(e) < self.distance_threshold:
+                self.isNear = True        
 
-        kp = 3
+        # Computing speed and angle
+        if self.isNear:
+            if np.linalg.norm(e[:2]) < self.distance_threshold:
+                K_speed = 0.0
+                K_rotation = 0.5
+            else:
+                K_speed = 0.5
+                K_rotation = 0.5
+
+            speed = K_speed * np.linalg.norm(e[:2])
+            theta = K_rotation * sawtooth(self.B[2, 0] - self.X[2, 0])
+        else :
+            K_speed = 0.4
+            K_rotation = 1.5
+            speed = K_speed * 3.0
+            theta = K_rotation * sawtooth(np.arctan2(e[1, 0], e[0, 0]) - self.X[2, 0])
+
+        
 
         # Building message
         msg = Twist()
-        msg.linear.x = kp * e[0, 0] * np.cos(theta)
+        msg.linear.x = speed
         msg.angular.z = theta
 
         # Publishing
         self.publisher.publish(msg)
         self.get_logger().info("Robot: {}, {}, {}".format(self.X[0, 0], self.X[1, 0], self.X[2, 0]))
-        self.get_logger().info("Ball: {}, {}, {}".format(self.B[0, 0], self.B[1, 0], self.B[2, 0]))
+        self.get_logger().info("Error: {}, {}, {}".format(self.isNear, speed, theta))
         self.get_logger().info("Publishing: {}, {}, {}".format(msg.linear.x, msg.linear.y, msg.angular.z))
 
 
