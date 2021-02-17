@@ -14,12 +14,12 @@ Le robot évolue sur un court de tennis. Des balles tombent aléatoirement sur l
 L'objectif du robot est de récupérer les balles et de les ramener dans les zones de dépose (orange).
 Chaque balle doit être ramenée le plus rapidement possible.
 En effet, le score qu'ajoute le dépôt d'une balle dans la zone de dépôt diminue de façon proportionnelle au temps qu'a passée la balle sur le court de tennis.
-[![video](https://github.com/MchouchENSTAB/TennisBallCollector/blob/master/docs/gifs/court.gif)]
+![video](https://github.com/MchouchENSTAB/TennisBallCollector/blob/master/docs/gifs/court.gif)
 
 
 L'environnement est composé d'une caméra zenital qui permet de detecter les balles grâce à une homographie planaire.
 
-[![video](https://github.com/MchouchENSTAB/TennisBallCollector/blob/master/docs/gifs/ball.gif)]
+![video](https://github.com/MchouchENSTAB/TennisBallCollector/blob/master/docs/gifs/ball.gif)
 
 ### Architecture du robot
 L'architecture du robot se divise en deux partie principalement :
@@ -38,7 +38,7 @@ Pour l'instant nous ne prenons pas en compte le côté usinable du collecteur.
 ![](./docs/img/pince.png)
 
 La version finale du robot dans son environnement :
-[![video](https://github.com/MchouchENSTAB/TennisBallCollector/blob/master/docs/gifs/robot.gif)]
+![video](https://github.com/MchouchENSTAB/TennisBallCollector/blob/master/docs/gifs/robot.gif)
 
 
 
