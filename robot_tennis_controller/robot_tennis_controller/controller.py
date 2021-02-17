@@ -1,6 +1,7 @@
 import rclpy
 from rclpy.node import Node
 
+from std_msgs import FLoat32
 from geometry_msgs.msg import Pose, Twist
 
 import numpy as np
@@ -18,27 +19,55 @@ class Controller(Node):
 
         # Subscriber
         self.robot_subscription = self.create_subscription(Pose, 'pose_rob', self.robot_position_callback, 25)
+        self.robot_angle_subscription = self.create_subscription(Float32, 'angle', self.robot_angle_callback, 25)
         self.ball_subscription = self.create_subscription(Pose, 'pose_ball', self.ball_position_callback, 25)
 
         # Ball and robot position
         self.X = np.zeros((3, 1))
         self.B = np.zeros((3, 1))
 
+        # Changing control law
+        isNear = False
+        distance_near = 3
+        distance_threshold = 0.5
+
     def robot_position_callback(self, data):
-        self.X = np.array([[data.position.x], [data.position.y], [data.position.z]])
+        self.X[0, 0] = data.position.x
+        self.X[1, 0] = data.position.y
+
+    def robot_angle_callback(self, data):
+        self.X[2, 0] = data.data
     
     def ball_position_callback(self, data):
-        self.B = np.array([[data.position.x], [data.position.y], [data.position.z]])
+        self.B = np.array([[data.position.x], [data.position.y], [data.angle.z]])
 
     def timer_callback(self):
-        d = (self.B - self.X)
-        if not np.allclose(d, np.zeros((3, 1))):
-            d /= np.linalg.norm(self.B - self.X)
+        # Position error processing
+        e = (self.B - self.X)
+
+        # Switching control law
+        if e < self.distance_near - distance_threshold:
+            self.isNear = True
+        if e > self.distance_near + distance_threshold:
+            self.isNear = False
+
+        # Computing angle control
+        if self.isNear:
+            theta = self.B[2, 0] - self.X[2, 0]
+        else:
+            theta = np.arctan2(e[1, 0], e[0, 0]) - self.X[2, 0]
+        
+        # Computing position control
+        if not np.allclose(e, np.zeros((3, 1))):
+            e /= np.linalg.norm(e)
+        else:
+            e = np.zeros((3, 1))
 
         # Building message
         msg = Twist()
-        msg.linear.x = d[0, 0]
-        msg.linear.y = d[1, 0]
+        msg.linear.x = e[0, 0]
+        msg.linear.y = e[1, 0]
+        msg.angular.z = theta
 
         # Publishing
         self.publisher.publish(msg)
