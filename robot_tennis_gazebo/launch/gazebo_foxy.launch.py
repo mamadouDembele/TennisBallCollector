@@ -17,6 +17,7 @@ def generate_launch_description():
         package="robot_state_publisher", executable="robot_state_publisher",
         arguments=[model_file]
         )
+    
     rqt_robot_steering_node=Node(package="rqt_robot_steering", executable="rqt_robot_steering")
     gazebo = IncludeLaunchDescription(
                 PythonLaunchDescriptionSource([path]),
