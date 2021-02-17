@@ -31,7 +31,7 @@
    </inertial>
     <visual>
       <geometry>
-        <cylinder length="0.03" radius="0.05"/>
+        <cylinder length="0.03" radius="0.06"/>
       </geometry>
       <origin xyz="0.0 0 0.0" rpy="0 1.57 1.57"/>
       <material name="Cyan">
@@ -40,7 +40,7 @@
     </visual>
     <collision>
      <geometry>
-        <cylinder length="0.03" radius="0.05"/>
+        <cylinder length="0.03" radius="0.06"/>
       </geometry>
       <origin xyz="0.0 0 0.0" rpy="0 1.57 1.57"/>
    </collision>
@@ -72,7 +72,7 @@
    </inertial>
     <visual>
       <geometry>
-        <cylinder length="0.03" radius="0.05"/>
+        <cylinder length="0.03" radius="0.06"/>
       </geometry>
       <origin xyz="0.0 0 0.0" rpy="0 1.57 1.57"/>
       <material name="Cyan">
@@ -81,11 +81,29 @@
     </visual>
     <collision>
      <geometry>
-        <cylinder length="0.03" radius="0.05"/>
+        <cylinder length="0.03" radius="0.06"/>
       </geometry>
       <origin xyz="0.0 0 0.0" rpy="0 1.57 1.57"/>
    </collision>
   </link>
+
+  <link name="imu_link">
+    <visual>
+      <geometry>
+        <cylinder length="0.02" radius="0.01"/>
+      </geometry>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+    </visual>
+    <material name="Green">
+       <color rgba="0 1.0 0.0 1.0"/>
+     </material>
+  </link>
+
+  <joint name="chassis_to_imu" type="fixed">
+    <parent link="chassis"/>
+    <child link="imu_link"/>
+    <origin xyz="0.17 0 0.07" rpy="0 0 0"/>
+  </joint>
 
   <gazebo reference="right_wheel">
     <mu1>1.2</mu1>
@@ -222,7 +240,7 @@
     <parent link="chassis"/>
     <child link="pince"/>
     <axis xyz="0 0 0"/>
-    <origin xyz="0.0 0 0.0" rpy="0 0 0"/>
+    <origin xyz="0.0 0 0.05" rpy="0 0 0"/>
   </joint>
 
   <gazebo reference="pince">
@@ -253,34 +271,26 @@
 
     </plugin>
   </gazebo>
-
-  <gazebo reference='compass'>
-        <sensor name="sensor_ray" type="ray">
-          <ray>
-            <scan>
-              <horizontal>
-                <samples>360</samples>
-                <resolution>1.0</resolution>
-                <min_angle>-3.14</min_angle>
-                <max_angle>3.14</max_angle>
-              </horizontal>
-            </scan>
-            <range>
-              <min>0.5</min>
-              <max>15.0</max>
-            </range>
-          </ray>
-          <always_on>true</always_on>
-          <update_rate>10</update_rate>
-          <!--<visualize>true</visualize>-->
-          <plugin name="laserscan" filename="libgazebo_ros_ray_sensor.so">
-            <ros>
-              <remapping>~/out:=scan</remapping>
-            </ros>
-            <output_type>sensor_msgs/LaserScan</output_type>
-          </plugin>
-      </sensor>
-   </gazebo>
+  <gazebo reference="imu_link">
+    <gravity>true</gravity>
+    <sensor name="imu_sensor" type="imu">
+      <always_on>true</always_on>
+      <update_rate>100</update_rate>
+      <visualize>true</visualize>
+      <topic>__default_topic__</topic>
+      <plugin filename="libgazebo_ros_imu_sensor.so" name="imu_plugin">
+        <topicName>imu</topicName>
+        <bodyName>imu_link</bodyName>
+        <updateRateHZ>10.0</updateRateHZ>
+        <gaussianNoise>0.0</gaussianNoise>
+        <xyzOffset>0 0 0</xyzOffset>
+        <rpyOffset>0 0 0</rpyOffset>
+        <frameName>imu_link</frameName>
+        <initialOrientationAsReference>false</initialOrientationAsReference>
+      </plugin>
+      <pose>0 0 0 0 0 0</pose>
+    </sensor>
+</gazebo>
 
 
 </robot>
