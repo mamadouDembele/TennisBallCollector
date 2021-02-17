@@ -3,6 +3,8 @@ from rclpy.node import Node
 
 from std_msgs import FLoat32
 from geometry_msgs.msg import Pose, Twist
+from sensor_msgs import Imu
+from tf.transformations import euler_from_quaternion
 
 import numpy as np
 
@@ -19,7 +21,7 @@ class Controller(Node):
 
         # Subscriber
         self.robot_subscription = self.create_subscription(Pose, 'pose_rob', self.robot_position_callback, 25)
-        self.robot_angle_subscription = self.create_subscription(Float32, 'angle', self.robot_angle_callback, 25)
+        self.robot_angle_subscription = self.create_subscription(Imu, 'imu_plugin/out', self.robot_angle_callback, 25)
         self.ball_subscription = self.create_subscription(Pose, 'pose_ball', self.ball_position_callback, 25)
 
         # Ball and robot position
@@ -36,7 +38,8 @@ class Controller(Node):
         self.X[1, 0] = data.position.y
 
     def robot_angle_callback(self, data):
-        self.X[2, 0] = data.data
+        (roll, pitch, yaw) = euler_from_quaternion ([data.orientation.x, data.orientation.y, data.orientation.z, orientation_data.orientation.w])
+        self.X[2, 0] = yaw
     
     def ball_position_callback(self, data):
         self.B = np.array([[data.position.x], [data.position.y], [data.angle.z]])
