@@ -1,12 +1,13 @@
 import numpy as np
 
+import rclpy
 from geometry_msgs.msg import Pose
 from std_msgs.msg import Bool
 from rclpy.node import Node
 from rclpy.qos import QoSProfile
 
 
-class TennisCollectorNavigation(Node):
+class TennisCollectorNavigationSimple(Node):
 
     def __init__(self):
         
@@ -26,6 +27,8 @@ class TennisCollectorNavigation(Node):
 
         qos = QoSProfile(depth=10)
 
+        timer_period = 0.05
+        self.timer = self.create_timer(timer_period, self.navigation)
 
         # PUBLISHER INITIALIZATION
         #-------------------------------------------------------------------
@@ -35,7 +38,7 @@ class TennisCollectorNavigation(Node):
         #-------------------------------------------------------------------
 
 
-        # PUBLISHER INITIALIZATION
+        # PUBLISHER SUBSCIPTER INITIALIZATION
         #-------------------------------------------------------------------
         self.ball_sub = self.create_subscription(
             Pose,
@@ -97,7 +100,7 @@ class TennisCollectorNavigation(Node):
                 else:
                     self.state = 2
             else :
-                self.state = 0
+                self.state = 3
         #-------------------------------------------------------------------
 
 
@@ -107,12 +110,12 @@ class TennisCollectorNavigation(Node):
 
             if self.is_ball_on_court == True:
                 if np.sign(self.pose_rob.y) != np.sign(self.pose_ball_y):
-                    state = 2
+                    state = 1
                 else:
                     self.x_wp = self.pose_ball_x
                     self.y_wp = self.pose_ball_y
             else:
-                self.state = 0
+                self.state = 3
         #-------------------------------------------------------------------
 
 
@@ -150,7 +153,22 @@ class TennisCollectorNavigation(Node):
         pose.pose.position.x = self.x_wp
         pose.pose.position.y = self.y_wp
         self.wp_pub.publish(pose)
+        self.get_logger().info("Publishing: {}, {}, {}".format(pose.x, pose.y))
 
         bool.data = self.move
         self.move_pub.publish(bool)
         #-------------------------------------------------------------------
+
+    def main(args=None):
+        rclpy.init(args=args)
+        navigation = TennisCollectorNavigationSimple()
+        rclpy.spin(navigation)
+
+        # Destroy the node explicitly
+        # (optional - otherwise it will be done automatically
+        # when the garbage collector destroys the node object)
+        minimal_publisher.destroy_node()
+        rclpy.shutdown()
+
+if __name__ == '__main__':
+    main()
