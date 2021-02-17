@@ -87,8 +87,9 @@ install(PROGRAMS
     DESTINATION lib/${PROJECT_NAME}/
 )
 
+
 install(PROGRAMS
-    scripts/spawn.py
+    scripts/read_camera.py
     DESTINATION lib/${PROJECT_NAME}/
 )
 

@@ -124,8 +124,10 @@ class TrackerPub(Node):
         ball_centers, robot_center, frame = self.computerVision(img)
         
         
-        # print("Ball center : ", ball_centers)
-        # print("Robot center : ", robot_center)
+        print("Ball center : ", ball_centers)
+        print("Robot center : ", robot_center)
+
+        
         base1 = (7, 13)
         base2 = (-7, -13)
 
@@ -164,8 +166,8 @@ class TrackerPub(Node):
 
         
         self.balls_publisher.publish(ball_poses)
-        cv2.imshow("Frame", frame)
-        cv2.waitKey(6)
+        # cv2.imshow("Frame", frame)
+        # cv2.waitKey(6)
         
         # cv2.imwrite('/tmp/post_im.png', img)
 
