@@ -65,8 +65,7 @@ class Controller(Node):
 
         # Building message
         msg = Twist()
-        msg.linear.x = e[0, 0]
-        msg.linear.y = e[1, 0]
+        msg.linear.x = e[0, 0] * np.cos(theta)
         msg.angular.z = theta
 
         # Publishing
