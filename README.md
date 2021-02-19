@@ -77,7 +77,7 @@ ros2 launch robot_tennis_gazebo spawner.launch.py
 * **Quentin Brateau** -  [Teusner](https://github.com/Teusner) :sunglasses:
 * **Paul-Antoine Le Tolguennec** - [Paul-antoineLeTolguenec](https://github.com/Paul-antoineLeTolguenec)
 * **Gwendal Priser** - [gwendalp](https://github.com/gwendalp) :ocean:
-
+* **Mamadou Dembele** [mamadouDembele](https://github.com/mamadouDembele)
 ### Gestion de projet
 
 Voici le lien [Taiga](https://tree.taiga.io/project/gwendalp-tennis-ball-collector/timeline).
